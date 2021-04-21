@@ -1,4 +1,5 @@
 #!/bin/bash
+source /etc/profile
 wifiOnText='Wi-Fi Power (en1): On'
 wifiDevice='en1'
 wifiSSID=''
@@ -37,6 +38,7 @@ connWifi(){
 }
 
 main(){
+    # check wifi ssid from argument
     wifiSSID=$1
     if [[ $# -eq 0 || -z "$wifiSSID" ]]
     then
@@ -45,6 +47,7 @@ main(){
     fi
     echo $wifiSSID
 
+    # check wifi is connected
     wifiIsConn
     wifiConn=$?
     if [ $wifiConn -eq 1 ]
@@ -53,16 +56,14 @@ main(){
         return
     fi
 
-    wifiSSID=$1
-
     isWifiOn
     wifiOn=$?
     if [ $wifiOn -eq 1 ]
     then
         turnWifiOff
+        echo 'ready to turn on wifi after 5 seconds'
+        sleep 5s
     fi
-    echo 'ready to turn on wifi after 5 seconds'
-    sleep 5s
 
     turnWifiOn
     sleep 5s
@@ -70,9 +71,10 @@ main(){
     wifiConn=$?
     if [ $wifiConn -eq 0 ]
     then
-        echo 'connecting to wifi'
+        echo 'connecting to wifi $wifiSSID'
         connWifi
     fi
 }
 
-main $@
+home_dir=`echo ~`
+main $@ > "$home_dir/Desktop/wifi_auto_reconnn.txt"
